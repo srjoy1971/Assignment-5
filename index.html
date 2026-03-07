@@ -12,15 +12,44 @@
 
     <!-- font geist -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gsttic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?afamily=Geist:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- style sheet -->
     <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
-    <h1 class="text-7xl py-9">hello h1</h1>
-</body>
+<body class="min-h-screen max-w-md mx-auto bg-base-100 shadow-xl ">
+    <div class="">
+        <img class="logo w-[100px] mx-auto pt-15 pb-5" src="./image/github-logo.png" alt="">
+        <div class="text-center">
+            <h1 class="font-bold text-2xl">GitHub Issues Tracker</h1>
+            <p class="text-[#64748B]">Sign in to manage your issues</p>
+        </div>
+    </div>
+    <div class="form pt-10 ">
+        <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow mx-auto rounded-2xl">
+            <div class="card-body">
+                <fieldset class="fieldset">
+                    <label class="label text-neutral font-bold">Username</label>
+                    <input id="input-username"  type="text"
+                        class="input rounded-md bg-base-200" placeholder="Enter Username" />
+                    <br>
+                    <label class="label text-neutral font-bold">Password</label>
+                    <input id="input-password"  type="" class="input rounded-md bg-base-200"
+                        placeholder="Enter Password" />
+                    <button id="signup-btn" class="btn btn-primary mt-4 rounded-md ">Sign up</button>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="divider">OR</div>
+    <div class=" rounded-lg text-center pb-9">
+        <p class="text-[#64748B] pb-3">Demo Credentials:</p>
+        <p>Username: admin</p>
+        <p>Password: admin123</p>
+    </div>
 
+    <script src="./script/signup.js"></script>
+</body>
 </html>
