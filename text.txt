@@ -1,0 +1,5 @@
+<div class="gap-3 flex bg">
+            <button class="btn btn-active btn-primary">All</button>
+            <button class="btn btn-active">Open</button>
+            <button class="btn btn-active">Closed</button>
+        </div>

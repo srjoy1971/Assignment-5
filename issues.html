@@ -1,11 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+    <!-- tailwind + daisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- font geist -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gsttic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?afamily=Geist:wght@100..900&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <h1>sdf</h1>
+    <header>
+        <div class="navbar bg-base-100 shadow-sm justify-between">
+            <div class="flex items-center gap-2">
+                <img src="./image/Group.png" alt="">
+                <p class="text-xl font-bold">GitHub Issues Tracker</p>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+                <button class="btn btn-primary"> + New Issue</button>
+            </div>
+        </div>
+    </header>
+    
+
+    <section id="" class="max-w-[1200px] bg-base-100 shadow-sm mx-auto mt-10 p-3 px-4 rounded-lg ">
+            <div  class="gap-3 flex bg">
+            <button onclick="loadIssues()" id="all-container" class="btn btn-active btn-primary">All</button>
+            <button id="btn-open" class="btn btn-active">Open</button>
+            <button id="btn-closed" class="btn btn-active">Closed</button>
+        </div>
+    </section>
+    <section id="" class="max-w-[1200px] bg-base-100 shadow-sm mx-auto rounded-lg flex items-center justify-between mt-4 p-1 px-3"> 
+        <div class="flex justify-between items-center gap-3">
+            <img src="./image/Aperture.png" alt="">
+            <div>
+                <p class="font-bold text-lg">50 Issues</p>
+                <p class="text-sm text-gray-500">Track and manage your project issues</p>
+            </div>
+        </div>
+        <div class="flex gap-3">
+           <div class="flex gap-1 items-center">
+             <img src="./image/Open-Status.png" alt="">
+             <p class="font-semibold">Open</p>
+           </div>
+           <div class="flex gap-1 items-center">
+             <img src="./image/Closed- Status .png" alt="">
+             <p class="font-semibold">Closed</p>
+           </div>
+        </div>
+    </section>
+
+     <section id="issue-container" class="max-w-[1200px] bg-base-100 mx-auto  p-3 rounded-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"> 
+     </section>
+
+
+    <script src="./script/issues.js"></script>
 </body>
+
 </html>
