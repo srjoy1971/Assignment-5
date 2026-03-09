@@ -1,89 +1,422 @@
-const loadIssues = () => {
-    fetch("https://phi-lab-server.vercel.app/api/v1/lab/issues")
-        .then(res => res.json())
-        .then((json) => displayIssues(json.data));
-}
+const searchBox = document.querySelector(".searchBox");
+const searchBtn = document.querySelector(".searchbtn");
+const issueContainer = document.getElementById("issue-container");
+const loader = document.getElementById("loader");
 
+let allIssues = [];
+
+// loader functions
+const showLoader = () => loader.classList.remove("hidden");
+const hideLoader = () => loader.classList.add("hidden");
+
+
+// 🔎 SEARCH
+const fetchIssues = async (query) => {
+
+    issueContainer.innerHTML = "";
+    showLoader();
+
+    const data = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issues/search?q=${query}`);
+    const response = await data.json();
+
+    hideLoader();
+
+    if (response.data.length === 0) {
+        issueContainer.innerHTML = "<p class='text-center text-gray-500 py-4'>No issues found.</p>";
+        return;
+    }
+
+    displayIssues(response.data);
+};
+
+searchBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const searchText = searchBox.value.trim();
+    if(searchText !== ""){
+        fetchIssues(searchText);
+    }
+});
+
+
+
+// 📦 LOAD ALL ISSUES
+const loadIssues = async () => {
+
+    showLoader();
+
+    const res = await fetch("https://phi-lab-server.vercel.app/api/v1/lab/issues");
+    const json = await res.json();
+
+    allIssues = json.data;
+
+    displayIssues(allIssues);
+
+    hideLoader();
+};
+
+
+
+// 🎨 DISPLAY ISSUES
 const displayIssues = (issues) => {
-    const issueContainer = document.getElementById("issue-container");
+
     issueContainer.innerHTML = "";
 
+    let allcount = document.getElementById("all-count");
+    if(allcount){
+        allcount.innerText = `${issues.length} Issues`;
+    }
+
     for (const issue of issues) {
+
         const btnDiv = document.createElement("div");
+
         btnDiv.innerHTML = `
-                     <div class="card bg-base-100 h-full shadow-md border-t-4 
-    ${issue.status === "open" ? "border-green-400" : ""}
-    ${issue.status === "closed" ? "border-purple-400" : ""}">
+<div onclick="showDetails('${issue.id}')" class="card bg-base-100 h-full shadow-md border-t-4 
+${issue.status === "open" ? "border-green-400" : ""}
+${issue.status === "closed" ? "border-purple-400" : ""}">
 
 <div class="card-body">
 
 <div class="flex justify-between items-center">
+
 <h2 class="card-title text-sm">${issue.title}</h2>
 
 <span class="badge 
-    ${issue.priority === "high" ? "badge-error" : ""}
-    ${issue.priority === "medium" ? "badge-warning" : ""}
-    ${issue.priority === "low" ? "badge-ghost" : ""}">
-    ${issue.priority.toUpperCase()}
+${issue.priority === "high" ? "badge-error" : ""}
+${issue.priority === "medium" ? "badge-warning" : ""}
+${issue.priority === "low" ? "badge-ghost" : ""}">
+${issue.priority.toUpperCase()}
 </span>
 
 </div>
 
 <p class="text-sm text-gray-500">${issue.description}</p>
+
 <div class="mt-2">
 ${issue.labels.map(label => {
-     const lowerLabel = label.toLowerCase();
-        return `<span class="badge 
-        ${lowerLabel === "bug" ? "badge-error" : ""}
-        ${lowerLabel === "help wanted" ? "badge-warning" : ""}
-        ${lowerLabel === "enhancement" ? "badge-success" : ""}
-        ${lowerLabel === "documentation" ? "badge-info" : ""}
-        ${lowerLabel === "good first issue" ? "badge-warning" : ""}
-    mr-1 mb-2">${label.toUpperCase()}</span>`;
-})
-.join("")
-};
+
+const lowerLabel = label.toLowerCase();
+
+return `<span class="badge 
+${lowerLabel === "bug" ? "badge-error" : ""}
+${lowerLabel === "help wanted" ? "badge-warning" : ""}
+${lowerLabel === "enhancement" ? "badge-success" : ""}
+${lowerLabel === "documentation" ? "badge-info" : ""}
+${lowerLabel === "good first issue" ? "badge-warning" : ""}
+mr-1 mb-2">${label.toUpperCase()}</span>`;
+
+}).join("")}
 </div>
 
 <div class="mt-3 text-xs text-gray-500">
- <p>#1 by ${issue.author}
- </p>
-  <p>${new Date(issue.createdAt).toLocaleDateString()}
- </p>
+<p>#1 by ${issue.author}</p>
+<p>${new Date(issue.createdAt).toLocaleDateString()}</p>
 </div>
 
 </div>
 </div>
         `;
+
         issueContainer.append(btnDiv);
     }
 };
+
+
+
+// 🎯 FILTER BUTTONS
+const btnAll = document.getElementById("all-container");
+const btnOpen = document.getElementById("btn-open");
+const btnClosed = document.getElementById("btn-closed");
+
+function toggleStyle(id){
+
+  btnAll.classList.remove("btn-active");
+  btnOpen.classList.remove("btn-active");
+  btnClosed.classList.remove("btn-active");
+
+  const selected = document.getElementById(id);
+  selected.classList.add("btn-active");
+}
+
+btnAll.addEventListener("click", () => {
+
+  showLoader();
+
+  setTimeout(() => {
+    displayIssues(allIssues);
+    toggleStyle("all-container");
+    hideLoader();
+  }, 300);
+
+});
+
+btnOpen.addEventListener("click", () => {
+
+  showLoader();
+
+  setTimeout(() => {
+    displayIssues(allIssues.filter(i => i.status === "open"));
+    toggleStyle("btn-open");
+    hideLoader();
+  }, 300);
+
+});
+
+btnClosed.addEventListener("click", () => {
+
+  showLoader();
+
+  setTimeout(() => {
+    displayIssues(allIssues.filter(i => i.status === "closed"));
+    toggleStyle("btn-closed");
+    hideLoader();
+  }, 300);
+
+});
+
+
+
+// 📄 ISSUE DETAILS MODAL
+const showDetails = (issueId) => {
+
+    showLoader();
+
+    fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${issueId}`)
+        .then(res => res.json())
+        .then(data => {
+
+            hideLoader();
+
+            const issue = data.data;
+
+            if (issue) {
+
+                document.getElementById("modal-title").innerText = issue.title;
+                document.getElementById("modal-description").innerText = issue.description;
+                document.getElementById("modal-assignee").innerText = issue.assignee || "Not Assigned";
+                document.getElementById("modal-priority").innerText = issue.priority.toUpperCase();
+                document.getElementById("modal-meta").innerText =
+                 `Created ${new Date(issue.createdAt).toLocaleDateString()}`;
+
+                const statusEl = document.getElementById("modal-status");
+
+                if(statusEl){
+                    statusEl.innerText = issue.status.toUpperCase();
+                }
+
+                my_modal_5.showModal();
+            }
+        })
+        .catch(err => console.error("Error:", err));
+};
+
+
+
+// 🚀 INIT
+loadIssues();
+toggleStyle("all-container");
+
+
+
+
+
+
+
+
+
+// const searchBox = document.querySelector(".searchBox");
+// const searchBtn = document.querySelector(".searchbtn");
+// const issueContainer = document.getElementById("issue-container");
+
+
+// const fetchIssues = async (query) => {
+//     issueContainer.innerHTML = "";
+
+//     const data = await fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issues/search?q=${query}`);
+//     const response = await data.json();
+
+//     if (response.data.length === 0) {
+//         issueContainer.innerHTML = "<p class='text-center text-gray-500 py-4'>No issues found.</p>";
+//         return;
+//     }
+
+//     response.data.forEach(issue => {
+//         const div = document.createElement("div");
+
+//         div.className = `card bg-base-100 h-full shadow-md border-t-4 mb-3 p-4 cursor-pointer
+//         ${issue.status === "open" ? "border-green-400" : ""}
+//         ${issue.status === "closed" ? "border-purple-400" : ""}`;
+
+//         div.innerHTML = `
+//             <div class="flex justify-between items-center mb-2">
+//                 <h2 class="card-title text-sm font-bold">${issue.title}</h2>
+//                 <span class="badge 
+//                     ${issue.priority === "high" ? "badge-error" : ""} 
+//                     ${issue.priority === "medium" ? "badge-warning" : ""} 
+//                     ${issue.priority === "low" ? "badge-ghost" : ""}">
+//                     ${issue.priority.toUpperCase()}
+//                 </span>
+//             </div>
+
+//             <p class="text-sm text-gray-500 mb-2">${issue.description}</p>
+
+//             <div class="mb-2">
+//                 ${issue.labels.map(label => {
+//                     const lowerLabel = label.toLowerCase();
+//                     return `<span class="badge 
+//                         ${lowerLabel === "bug" ? "badge-error" : ""} 
+//                         ${lowerLabel === "enhancement" ? "badge-success" : ""} 
+//                         ${lowerLabel === "documentation" ? "badge-info" : ""} 
+//                         mr-1 mb-1">${label.toUpperCase()}</span>`;
+//                 }).join("")}
+//             </div>
+
+//             <div class="text-xs text-gray-500">
+//                 <p>#1 by ${issue.author}</p>
+//                 <p>${new Date(issue.createdAt).toLocaleDateString()}</p>
+//             </div>
+//         `;
+
+//         div.onclick = () => showDetails(issue.id);
+
+//         issueContainer.appendChild(div);
+//     });
+// };
+
+// searchBtn.addEventListener("click", (e) => {
+//     e.preventDefault();
+//     const searchText = searchBox.value.trim();
+//     if(searchText !== ""){
+//         fetchIssues(searchText);
+//     }
+// });
+
+
+
+// let allIssues = [];
+
+// const loadIssues = () => {
+//     fetch("https://phi-lab-server.vercel.app/api/v1/lab/issues")
+//         .then(res => res.json())
+//         .then((json) => {
+//             allIssues = json.data; 
+//             displayIssues(allIssues);
+//         });
+// };
+// const displayIssues = (issues) => {
+    
+
+//     const issueContainer = document.getElementById("issue-container");
+//     issueContainer.innerHTML = "";
+
+//     let allcount = document.getElementById("all-count");
+//     allcount.innerText = `${issues.length} Issues`;
+    
+//     for (const issue of issues) {
+//         const btnDiv = document.createElement("div");
+
+    
+
+//         btnDiv.innerHTML = `
+//                      <div onclick="showDetails('${issue.id}')" class="card bg-base-100 h-full shadow-md border-t-4 
+//     ${issue.status === "open" ? "border-green-400" : ""}
+//     ${issue.status === "closed" ? "border-purple-400" : ""}">
+
+// <div class="card-body">
+
+// <div class="flex justify-between items-center">
+// <h2 class="card-title text-sm">${issue.title}</h2>
+
+// <span class="badge 
+//     ${issue.priority === "high" ? "badge-error" : ""}
+//     ${issue.priority === "medium" ? "badge-warning" : ""}
+//     ${issue.priority === "low" ? "badge-ghost" : ""}">
+//     ${issue.priority.toUpperCase()}
+// </span>
+
+// </div>
+
+// <p  class="text-sm text-gray-500">${issue.description}</p>
+// <div class="mt-2">
+// ${issue.labels.map(label => {
+//      const lowerLabel = label.toLowerCase();
+//         return `<span class="badge 
+//         ${lowerLabel === "bug" ? "badge-error" : ""}
+//         ${lowerLabel === "help wanted" ? "badge-warning" : ""}
+//         ${lowerLabel === "enhancement" ? "badge-success" : ""}
+//         ${lowerLabel === "documentation" ? "badge-info" : ""}
+//         ${lowerLabel === "good first issue" ? "badge-warning" : ""}
+//     mr-1 mb-2">${label.toUpperCase()}</span>`;
+// })
+// .join("")}
+// </div>
+
+// <div class="mt-3 text-xs text-gray-500">
+//  <p>#1 by ${issue.author}
+//  </p>
+//   <p>${new Date(issue.createdAt).toLocaleDateString()}
+//  </p>
+// </div>
+
+// </div>
+// </div>
+//         `;
+//         issueContainer.append(btnDiv);
+//     }
+// };
 
 
 // const btnAll = document.getElementById("all-container");
 // const btnOpen = document.getElementById("btn-open");
 // const btnClosed = document.getElementById("btn-closed");
 
+// function toggleStyle(id){
+//   btnAll.classList.remove("btn-active");
+//   btnOpen.classList.remove("btn-active");
+//   btnClosed.classList.remove("btn-active");
+
+//   const selected = document.getElementById(id);
+//   selected.classList.add("btn-active");
+// }
+
 // btnAll.addEventListener("click", () => {
 //   displayIssues(allIssues);
-//   btnAll.className = "btn btn-outline btn-sm btn-active";
-//   btnOpen.className = "btn btn-outline btn-sm";
-//   btnClosed.className = "btn btn-outline btn-sm";
+//   toggleStyle("all-container");
 // });
 
 // btnOpen.addEventListener("click", () => {
 //   displayIssues(allIssues.filter(i => i.status === "open"));
-//   btnOpen.className = "btn btn-success btn-sm"; // green
-//   btnAll.className = "btn btn-outline btn-sm";
-//   btnClosed.className = "btn btn-outline btn-sm";
+//   toggleStyle("btn-open");
 // });
 
 // btnClosed.addEventListener("click", () => {
 //   displayIssues(allIssues.filter(i => i.status === "closed"));
-//   btnClosed.className = "btn btn-purple btn-sm"; // purple
-//   btnAll.className = "btn btn-outline btn-sm";
-//   btnOpen.className = "btn btn-outline btn-sm";
+//   toggleStyle("btn-closed");
 // });
 
+// const showDetails = (issueId) => {
+//     fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${issueId}`)
+//         .then(res => res.json())
+//         .then(data => {
+//             const issue = data.data; 
+            
+//             if (issue) {
+//                 document.getElementById("modal-title").innerText = issue.title;
+//                 document.getElementById("modal-description").innerText = issue.description;
+//                 document.getElementById("modal-assignee").innerText = issue.assignee || "Not Assigned";
+//                 document.getElementById("modal-priority").innerText = issue.priority.toUpperCase();
+//                 document.getElementById("modal-meta").innerText = `Created ${new Date(issue.createdAt).toLocaleDateString()}`;
 
+//                 const statusEl = document.getElementById("modal-status");
+//                 if(statusEl) {
+//                     statusEl.innerText = issue.status.toUpperCase();
+//                 }
+                
+//                 my_modal_5.showModal();
+//             }
+//         })
+//         .catch(err => console.error("Error:", err));
+// };
 // loadIssues();
+// toggleStyle("all-container");
+
