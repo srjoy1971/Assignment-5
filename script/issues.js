@@ -29,13 +29,10 @@ const fetchIssues = async (query) => {
 searchBtn.addEventListener("click", (e) => {
     e.preventDefault();
     const searchText = searchBox.value.trim();
-    if(searchText !== ""){
+    if (searchText !== "") {
         fetchIssues(searchText);
     }
 });
-
-
-
 
 const loadIssues = async () => {
 
@@ -56,7 +53,7 @@ const displayIssues = (issues) => {
     issueContainer.innerHTML = "";
 
     let allcount = document.getElementById("all-count");
-    if(allcount){
+    if (allcount) {
         allcount.innerText = `${issues.length} Issues`;
     }
 
@@ -89,9 +86,9 @@ ${issue.priority.toUpperCase()}
 <div class="mt-2">
 ${issue.labels.map(label => {
 
-const lowerLabel = label.toLowerCase();
+            const lowerLabel = label.toLowerCase();
 
-return `<span class="badge 
+            return `<span class="badge 
 ${lowerLabel === "bug" ? "badge-error" : ""}
 ${lowerLabel === "help wanted" ? "badge-warning" : ""}
 ${lowerLabel === "enhancement" ? "badge-success" : ""}
@@ -99,7 +96,7 @@ ${lowerLabel === "documentation" ? "badge-info" : ""}
 ${lowerLabel === "good first issue" ? "badge-warning" : ""}
 mr-1 mb-2">${label.toUpperCase()}</span>`;
 
-}).join("")}
+        }).join("")}
 </div>
 
 <div class="mt-3 text-xs text-gray-500">
@@ -119,49 +116,49 @@ const btnAll = document.getElementById("all-container");
 const btnOpen = document.getElementById("btn-open");
 const btnClosed = document.getElementById("btn-closed");
 
-function toggleStyle(id){
+function toggleStyle(id) {
 
-  btnAll.classList.remove("btn-active");
-  btnOpen.classList.remove("btn-active");
-  btnClosed.classList.remove("btn-active");
+    btnAll.classList.remove("btn-active");
+    btnOpen.classList.remove("btn-active");
+    btnClosed.classList.remove("btn-active");
 
-  const selected = document.getElementById(id);
-  selected.classList.add("btn-active");
+    document.getElementById(id).classList.add("btn-active");
+
 }
 
 btnAll.addEventListener("click", () => {
 
-  showLoader();
+    showLoader();
 
-  setTimeout(() => {
-    displayIssues(allIssues);
-    toggleStyle("all-container");
-    hideLoader();
-  }, 300);
+    setTimeout(() => {
+        displayIssues(allIssues);
+        toggleStyle("all-container");
+        hideLoader();
+    }, 300);
 
 });
 
 btnOpen.addEventListener("click", () => {
 
-  showLoader();
+    showLoader();
 
-  setTimeout(() => {
-    displayIssues(allIssues.filter(i => i.status === "open"));
-    toggleStyle("btn-open");
-    hideLoader();
-  }, 300);
+    setTimeout(() => {
+        displayIssues(allIssues.filter(i => i.status === "open"));
+        toggleStyle("btn-open");
+        hideLoader();
+    }, 300);
 
 });
 
 btnClosed.addEventListener("click", () => {
 
-  showLoader();
+    showLoader();
 
-  setTimeout(() => {
-    displayIssues(allIssues.filter(i => i.status === "closed"));
-    toggleStyle("btn-closed");
-    hideLoader();
-  }, 300);
+    setTimeout(() => {
+        displayIssues(allIssues.filter(i => i.status === "closed"));
+        toggleStyle("btn-closed");
+        hideLoader();
+    }, 300);
 
 });
 
@@ -184,11 +181,23 @@ const showDetails = (issueId) => {
                 document.getElementById("modal-assignee").innerText = issue.assignee || "Not Assigned";
                 document.getElementById("modal-priority").innerText = issue.priority.toUpperCase();
                 document.getElementById("modal-meta").innerText =
-                 `Created ${new Date(issue.createdAt).toLocaleDateString()}`;
+                    `Created ${new Date(issue.createdAt).toLocaleDateString()}`;
+                document.getElementById("modal-labels").innerHTML = issue.labels.map(label => {
 
+                    const lowerLabel = label.toLowerCase();
+
+                    return `<span class="badge 
+                 ${lowerLabel === "bug" ? "badge-error" : ""}
+                ${lowerLabel === "help wanted" ? "badge-warning" : ""}
+                ${lowerLabel === "enhancement" ? "badge-success" : ""}
+                ${lowerLabel === "documentation" ? "badge-info" : ""}
+                ${lowerLabel === "good first issue" ? "badge-warning" : ""}
+                mr-1 mb-2">${label.toUpperCase()}</span>`;
+
+                }).join("");
                 const statusEl = document.getElementById("modal-status");
 
-                if(statusEl){
+                if (statusEl) {
                     statusEl.innerText = issue.status.toUpperCase();
                 }
 
@@ -200,3 +209,20 @@ const showDetails = (issueId) => {
 
 loadIssues();
 toggleStyle("all-container");
+
+function toggleStyle(id) {
+    const buttons = ["all-container", "btn-open", "btn-closed"];
+
+    buttons.forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.classList.remove("btn-primary", "text-white", "bg-gray-300");
+            btn.classList.add("btn-outline");
+        }
+    });
+    const selected = document.getElementById(id);
+    if (selected) {
+        selected.classList.remove("btn-outline");
+        selected.classList.add("btn-primary", "text-white");
+    }
+}
