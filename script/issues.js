@@ -1,3 +1,4 @@
+
 const searchBox = document.querySelector(".searchBox");
 const searchBtn = document.querySelector(".searchbtn");
 const issueContainer = document.getElementById("issue-container");
@@ -85,7 +86,6 @@ ${issue.priority.toUpperCase()}
 
 <div class="mt-2">
 ${issue.labels.map(label => {
-
             const lowerLabel = label.toLowerCase();
 
             return `<span class="badge 
